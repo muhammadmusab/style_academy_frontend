@@ -1,2 +1,1 @@
-# style_academy_frontend
-Ecommerce Website for Clothing Brand
+- design: https://www.figma.com/design/1go58m1DuWaBkg0m7ZLAZv/Restaurant-web?node-id=357-4&t=ch3gStCvDVb5wtj8-0
