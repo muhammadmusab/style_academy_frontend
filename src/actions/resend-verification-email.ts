@@ -1,19 +1,16 @@
 "use server";
 import { authInstance } from "@/services/instances/auth-instance";
 
-// REMEMBER: fetch requests are not cached when: Used inside a Server Action. Because we don't need caching here anyways
-export async function register(
+export async function ResendVerificationEmail(
   data: FormData,
-  config?: {
-    role: "customer" | "admin";
-  }
+  config: any
 ): Promise<any> {
   try {
     const { role = "customer" } = config ?? {};
     const objectData = Object.fromEntries(data.entries());
 
-    const res: any = await authInstance.post(
-      `/auth/register?role=${role}`,
+    const res:any = authInstance.post(
+      `auth/resend-verification-mail?${role}`,
       objectData
     );
 

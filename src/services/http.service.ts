@@ -120,9 +120,9 @@ export class HttpService {
 
       // if status is 401 try refresh token (not using refresh token here in this project , we are using only accessToken)
       // that is useRefreshToken=false in the auth-instance.ts file
-      if (response.status === 401 && useRefreshToken) {
-        return this.refreshToken<T>(fullUrl, options);
-      }
+      // if (response.status === 401 && useRefreshToken) {
+      //   return this.refreshToken<T>(fullUrl, options);
+      // }
 
       const data = await this.parseJson(response);
 

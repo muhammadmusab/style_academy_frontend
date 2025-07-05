@@ -10,3 +10,5 @@ export { createProductFilter } from "./product-filter";
 export { updateProfile } from "./update-profile";
 export { resetPassword } from "./reset-password";
 export { trackOrder } from "./track-order";
+export { ResendVerificationEmail } from "./resend-verification-email";
+export { logout } from "./logout";

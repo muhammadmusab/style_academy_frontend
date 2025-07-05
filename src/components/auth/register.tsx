@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { AiOutlineLock, AiOutlineMail } from "react-icons/ai";
 import * as actions from "@/actions";
 import { useToast } from "@/hooks/useToast";
-import { toast, Toaster } from "sonner";
+import { Toaster } from "sonner";
 import { redirect } from "next/navigation";
 const formSchema = yup.object({
   email: yup.string().email().required("Required"),
@@ -36,39 +36,31 @@ const Register = () => {
   // type formSchemaType = yup.InferType<typeof formSchema>;
 
   const onSubmit = async (formData: FormData) => {
+    let res;
+    let success = false;
     try {
       const isValid = await form.trigger();
       if (!isValid) return;
-      const res = await actions.register(formData);
-      if (res && res.success && res.auth.status === "activation_pending") {
+      res = await actions.register(formData);
+      if (
+        res.success &&
+        res.data &&
+        res.data.auth &&
+        res.data.auth.status === "activation_pending"
+      ) {
+        success = true;
         successToast("Please check your email inbox to complete registration");
-        redirect("/");
-      } else {
+      } else if (!res.success) {
         errorToast(res.data);
       }
     } catch (error: any) {
       errorToast(error.message);
     }
+    if (success) {
+      redirect("/");
+    }
   };
   const inputs = [
-    // {
-    //   formControl: InputControlType.Input,
-    //   name: "name",
-    //   InputcontainerClass: "",
-    //   label: {
-    //     className: "absolute top-[12px] left-0",
-    //     icon: <AiOutlineUser className="text-[19px]" />,
-    //     prepend: true,
-    //     iconClass: "text-[19px]",
-    //   },
-
-    //   inputProps: {
-    //     type: "text",
-    //     className: "pl-[25px]",
-    //     placeholder: "Name",
-    //   },
-    //   colClass: "max-w-[100%] basis-[100%]",
-    // },
     {
       formControl: InputControlType.Input,
       name: "email",

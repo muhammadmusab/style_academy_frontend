@@ -3,11 +3,29 @@ import Link from "next/link";
 import React, { Fragment } from "react";
 import { IoSearch } from "react-icons/io5";
 import { FaShoppingBag } from "react-icons/fa";
-import AuthSidebar from "../common/auth-sidebar";
-import { AiOutlineUser } from "react-icons/ai";
 import CartSidebar from "../common/cart-sidebar";
+import AuthSidebar from "../auth/auth-sidebar";
+import { AiOutlineUser } from "react-icons/ai";
+import AccountMenu from "../auth/account-menu";
+import { serviceInstance } from "@/services/instances/service-instance";
 
-const Header = () => {
+const Header = async () => {
+  let isLoggedin = false;
+  try {
+    const response: any = await serviceInstance.get(`/auth/get-token`, {
+      next: { tags: ["get-token"] },
+
+    });
+    if (response.data.email) {
+      isLoggedin = true;
+    } else {
+      isLoggedin = false;
+    }
+  } catch (error: any) {
+    if (error.status === 401) {
+      isLoggedin = false;
+    }
+  }
   const cartItems = [
     {
       id: "83701f42-d11c-45fb-b49e-94117e2ed0ec",
@@ -41,16 +59,6 @@ const Header = () => {
       type: "button",
     },
   ];
-  let account = (
-    <AuthSidebar
-      headerText="Account"
-      headerImage="/account.svg"
-      key={"account"}
-      icon={
-        <AiOutlineUser className="text-[25px] hover:text-primary ml-[20px]" />
-      }
-    />
-  );
   return (
     <Fragment>
       <div className="bg-primary text-white text-center w-full py-[15px]">
@@ -77,8 +85,17 @@ const Header = () => {
                   >
                     {link.label}
                   </Link>
+                ) : isLoggedin ? (
+                  <AccountMenu />
                 ) : (
-                  account
+                  <AuthSidebar
+                    headerText="Account"
+                    headerImage="/account.svg"
+                    key={"account"}
+                    icon={
+                      <AiOutlineUser className="text-[25px] hover:text-primary ml-[20px]" />
+                    }
+                  />
                 )
               )}
             </div>
