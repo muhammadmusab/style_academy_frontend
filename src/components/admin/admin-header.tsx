@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { Fragment } from "react";
+import AdminLogoutButton from "./admin-logout-button";
 
 const AdminHeader = () => {
   const links = [
@@ -39,7 +40,7 @@ const AdminHeader = () => {
               ))}
             </div>
             <div className="px-[20px]">
-              <button className="font-bold hover:text-primary">Logout</button>
+              <AdminLogoutButton/>
             </div>
           </div>
         </div>

@@ -17,11 +17,16 @@ const userOnlyRoutes = [
   "/confirmation/success",
   "/track-order",
 ];
-const AdminOnlyRoutes = ["/admin/orders", "/admin/products", "/admin/variants"];
+const AdminOnlyRoutes = [
+  "/admin/dashboard",
+  "/admin/orders",
+  "/admin/products",
+  "/admin/variants",
+];
 
 const protectedRoutes: string[] = [];
 
-export default function middleware(req: NextRequest) {
+export default function middleware(req: NextRequest, res: NextResponse) {
   const type =
     req.cookies.get(USER_ROLE_KEY)?.value === "customer"
       ? req.cookies.get(USER_ROLE_KEY)?.value
@@ -40,7 +45,18 @@ export default function middleware(req: NextRequest) {
     req.nextUrl.pathname.includes(route)
   );
 
-  // If not authenticated redirect to login page
+  // if path is /admin redirect to /admin/dashboard (if authorized) otherwise redirect to /admin/login
+  if (req.nextUrl.pathname === "/admin" && type === "admin") {
+    if (isAuthenticated) {
+      const absoluteURL = new URL("/admin/dashboard", req.nextUrl.origin);
+      return NextResponse.redirect(absoluteURL.toString());
+    } else {
+      const absoluteURL = new URL("/admin/login", req.nextUrl.origin);
+      return NextResponse.redirect(absoluteURL.toString());
+    }
+  }
+
+  // If not authenticated redirect to home
   if (
     !isAuthenticated &&
     (isProtectedRoute || isUserOnlyRoute || isAdminOnlyRoute)
@@ -50,11 +66,12 @@ export default function middleware(req: NextRequest) {
   }
 
   // If loggedin but not authorized, redirect to home
-  if (
-    (isUserOnlyRoute && type !== "customer") ||
-    (isAdminOnlyRoute && type !== "admin")
-  ) {
+  if (isUserOnlyRoute && type !== "customer") {
     const absoluteURL = new URL("/", req.nextUrl.origin);
+    return NextResponse.redirect(absoluteURL.toString());
+  }
+  if (isAdminOnlyRoute && type !== "admin") {
+    const absoluteURL = new URL("/admin/login", req.nextUrl.origin);
     return NextResponse.redirect(absoluteURL.toString());
   }
 }

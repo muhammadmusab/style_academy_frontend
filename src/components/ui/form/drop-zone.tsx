@@ -75,6 +75,7 @@ export const Dropzone = ({
       label={label}
       description={description}
       containerClass={inputcontainerClass}
+      showMessage={true}
     >
       <div
         {...getRootProps({

@@ -56,7 +56,7 @@ const Preview = ({
         className="block ml-auto text-destructive"
         type="button"
         onClick={(e) => {
-          e.stopPropagation()
+          e.stopPropagation();
           onDelete?.(id, type);
         }}
       >
@@ -77,11 +77,12 @@ const Preview = ({
   return (
     <Card
       className={cn(
-        "flex-row  mb-3 items-center  h-full",
+        "flex-row  mb-3 items-center  h-full border-0 relative",
         status === "failed" ? "text-destructive border-destructive" : ""
       )}
     >
-      <div className="w-20 h-20 flex justify-center items-center">
+      <div className="absolute top-0 right-0">{control}</div>
+      <div className="w-[130px] h-[130px] flex justify-center items-center ">
         {mime?.indexOf("image") > -1 ? (
           <Image
             src={url}
@@ -99,19 +100,6 @@ const Preview = ({
           <HiDocumentText size="1.75rem" className="text-danger" />
         )}
       </div>
-
-      <Spacing className="ml-3 flex-1" level={3}>
-        {control}
-        <Text level={3}>
-          {shortenedName}.{extenstion}
-        </Text>
-        <Text level={3}>
-          {fileSize.toFixed(2)} {sizeUnit}
-        </Text>
-        {errors?.map((error) => (
-          <Text key={error}>{error}</Text>
-        ))}
-      </Spacing>
     </Card>
   );
 };
@@ -130,9 +118,9 @@ export const FilesPreview = ({
   return (
     <Fragment>
       {Boolean(files.length) && (
-        <Row className={cn("gap-2 flex-wrap mt-[16px]")}>
+        <Row className={cn("gap-2 flex-wrap mt-[16px] [&>*]:w-auto   ")}>
           {files.map((file) => (
-            <Col key={file.name} className="max-w-[24%] basis-[24%]">
+            <Col key={file.name} className="max-w-[150px] basis-[150px]">
               <Preview {...file} onDelete={onDelete} onRetry={onRetry} />
             </Col>
           ))}
@@ -144,9 +132,9 @@ export const FilesPreview = ({
         </Heading>
       )}
       {Boolean(rejectedFiles.length) && (
-        <Row className={cn("gap-2 flex-wrap mt-[16px]")}>
+        <Row className={cn("gap-2 flex-wrap mt-[16px] [&>*]:w-auto   ")}>
           {rejectedFiles.map((file) => (
-            <Col key={file.name} className="max-w-[24%] basis-[24%]">
+            <Col key={file.name} className="max-w-[150px] basis-[150px]">
               <Preview {...file} type="rejected-file" onDelete={onDelete} />
             </Col>
           ))}

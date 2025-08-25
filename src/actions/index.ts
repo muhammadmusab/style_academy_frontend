@@ -12,3 +12,4 @@ export { resetPassword } from "./reset-password";
 export { trackOrder } from "./track-order";
 export { ResendVerificationEmail } from "./resend-verification-email";
 export { logout } from "./logout";
+export { logoutAdmin } from "./logout-admin";

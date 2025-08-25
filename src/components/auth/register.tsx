@@ -15,7 +15,7 @@ import { Toaster } from "sonner";
 import { redirect } from "next/navigation";
 const formSchema = yup.object({
   email: yup.string().email().required("Required"),
-  password: yup.string().min(8).required("Required"),
+  password: yup.string().min(6).required("Required"),
   repeatPassword: yup
     .string()
     .required("Repeat Password is required")

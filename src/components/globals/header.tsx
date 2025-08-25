@@ -7,25 +7,11 @@ import CartSidebar from "../common/cart-sidebar";
 import AuthSidebar from "../auth/auth-sidebar";
 import { AiOutlineUser } from "react-icons/ai";
 import AccountMenu from "../auth/account-menu";
-import { serviceInstance } from "@/services/instances/service-instance";
+import { getProfile } from "@/services/requests/get-profile";
 
 const Header = async () => {
-  let isLoggedin = false;
-  try {
-    const response: any = await serviceInstance.get(`/auth/get-token`, {
-      next: { tags: ["get-token"] },
-
-    });
-    if (response.data.email) {
-      isLoggedin = true;
-    } else {
-      isLoggedin = false;
-    }
-  } catch (error: any) {
-    if (error.status === 401) {
-      isLoggedin = false;
-    }
-  }
+  const user = await getProfile();
+  const isLoggedin = user?.email ? true : false;
   const cartItems = [
     {
       id: "83701f42-d11c-45fb-b49e-94117e2ed0ec",

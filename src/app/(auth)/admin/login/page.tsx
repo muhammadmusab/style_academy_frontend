@@ -11,12 +11,16 @@ import { AiOutlineUser, AiOutlineLock } from "react-icons/ai";
 import * as actions from "@/actions";
 import { useToast } from "@/hooks/useToast";
 import { Toaster } from "sonner";
+import Image from "next/image";
+import { Fragment } from "react";
+import { redirect,useRouter } from "next/navigation";
 const formSchema = yup.object({
   email: yup.string().email().required("Required"),
   password: yup.string().min(6).required("Required"),
 });
 
 const Login = () => {
+  const router=useRouter()
   const { errorToast, successToast } = useToast();
 
   const form = useForm({
@@ -33,10 +37,11 @@ const Login = () => {
     try {
       const valid = await form.trigger();
       if (!valid) return;
-      res = await actions.login(formData, { role: "customer" });
+      res = await actions.login(formData, { role: "admin" });
 
       if (res && res.success) {
         successToast("Logged in Successfully");
+        router.push('/admin/dashboard')
       } else if (!res.success) {
         errorToast(res.data);
       }
@@ -80,21 +85,38 @@ const Login = () => {
     },
   ];
   return (
-    <Form {...form}>
-      <Toaster position="top-right" />
-      <form action={onSubmit} className="space-y-8">
-        <Row className="justify-between gap-2">
-          {inputs.map(({ colClass, ...input }, i) => (
-            <Col key={input.name} className={`${colClass} my-[10px]`}>
-              <FormContainer control={form.control} input={input} />
-            </Col>
-          ))}
-        </Row>
-        <button className="transition-all flex items-center gap-3 bg-primary text-white hover:text-white hover:bg-black py-2 px-3">
-          Log In
-        </button>
-      </form>
-    </Form>
+    <Fragment>
+      <div className="text-center w-full flex items-center justify-center mt-[20px]">
+        <Image
+          src={"/logo2.png"}
+          width={200}
+          height={100}
+          alt="Logo"
+          className="mt-2"
+        />
+      </div>
+      <div className="h-[90%] flex items-center justify-center">
+        <div>
+          <h1 className="text-2xl fw-bold mb-[20px] text-center text-primary">Admin Login</h1>
+
+          <Form {...form}>
+            <Toaster position="top-right" />
+            <form action={onSubmit} className="space-y-8">
+              <Row className="justify-between gap-2">
+                {inputs.map(({ colClass, ...input }, i) => (
+                  <Col key={input.name} className={`${colClass} my-[10px]`}>
+                    <FormContainer control={form.control} input={input} />
+                  </Col>
+                ))}
+              </Row>
+              <button className="transition-all flex items-center gap-3 bg-primary text-white hover:text-white hover:bg-black py-2 px-3">
+                Log In
+              </button>
+            </form>
+          </Form>
+        </div>
+      </div>
+    </Fragment>
   );
 };
 

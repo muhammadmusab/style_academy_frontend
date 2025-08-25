@@ -17,12 +17,12 @@ import { useFileUpload } from "@/hooks/useFileUpload";
 // import { listColors, listSizes } from "@/services/requests/attribute";
 // import { useFormState } from "react-dom";
 const formSchema = yup.object({
-  title: yup.string(),
-  brand: yup.string(),
-  status: yup.string(),
-  description: yup.string(),
-  category: yup.string(),
-  details: yup.string(),
+  title: yup.string().required(),
+  brand: yup.string().required(),
+  status: yup.string().required(),
+  description: yup.string().required(),
+  category: yup.string().required(),
+  details: yup.string().required(),
   sku: yup.string(),
   quantity: yup.number(),
   currentPrice: yup.number(),
@@ -37,7 +37,7 @@ const formSchema = yup.object({
         height: yup.string().required(),
         cover: yup.boolean().required(),
       })
-    ),
+    ).required('Media is required field'),
 });
 
 const ProductForm = ({ uuid }: { uuid: string }) => {

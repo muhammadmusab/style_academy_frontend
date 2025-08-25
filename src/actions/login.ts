@@ -26,7 +26,7 @@ export async function login(
     if (res.data) {
       setRole(res.data.role);
       setAccessToken(res.data.token);
-      revalidateTag("get-token");
+      revalidateTag("get-profile");
     }
     return {
       success: true,

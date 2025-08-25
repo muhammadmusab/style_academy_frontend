@@ -4,7 +4,7 @@ import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { ACCESS_TOKEN_COOKIE_KEY, USER_ROLE_KEY } from "@/constants";
-export async function logout(): Promise<any> {
+export async function logoutAdmin(): Promise<any> {
   try {
     const res: any = await serviceInstance.get(`/auth/signout`);
     if (res.data) {
@@ -22,6 +22,6 @@ export async function logout(): Promise<any> {
     };
   } finally {
     revalidateTag("get-profile");
-    redirect("/");
+    redirect("/admin/login");
   }
 }

@@ -1,54 +1,49 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { twMerge } from "tailwind-merge";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import * as React from "react"
+import { ChevronDownIcon } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { FormControl } from "@/components/ui/form/form";
+} from "@/components/ui/popover"
 
-export function DatePicker({
-  field,
-  label,
-  onSelect,
-}: {
-  field: any;
-  label: string;
-  onSelect: Function;
-}) {
+export function Calendar22() {
+  const [open, setOpen] = React.useState(false)
+  const [date, setDate] = React.useState<Date | undefined>(undefined)
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <FormControl>
+    <div className="flex flex-col gap-3">
+      <label htmlFor="date" className="px-1">
+        Date of birth
+      </label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
-            variant={"outline"}
-            className={twMerge(
-              "w-full pl-3 text-left font-normal  border-b border-black rounded-none",
-              !field.value && "text-muted-foreground"
-            )}
+            variant="outline"
+            id="date"
+            className="w-48 justify-between font-normal"
           >
-            {field.value ? format(field.value, "PPP") : <span>{label}</span>}
-            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+            {date ? date.toLocaleDateString() : "Select date"}
+            <ChevronDownIcon />
           </Button>
-        </FormControl>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-white" align="start">
-        <Calendar
-          mode="single"
-          selected={field.value}
-          onSelect={onSelect}
-          disabled={(date) =>
-            date > new Date() || date < new Date("1900-01-01")
-          }
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover>
-  );
+        </PopoverTrigger>
+        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={date}
+            captionLayout="dropdown"
+            onSelect={(date) => {
+              setDate(date)
+              setOpen(false)
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
 }

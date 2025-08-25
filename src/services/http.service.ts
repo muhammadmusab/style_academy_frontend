@@ -1,5 +1,6 @@
-import { getCookie } from 'cookies-next';
-import { ACCESS_TOKEN_COOKIE_KEY } from '@/constants/index';
+import { getCookie } from "cookies-next";
+import { ACCESS_TOKEN_COOKIE_KEY } from "@/constants/index";
+import { redirect } from "next/navigation";
 export interface FetchOptions extends RequestInit {
   headers?: {
     [key: string]: string;
@@ -12,10 +13,10 @@ export interface FetchOptions extends RequestInit {
 }
 
 export enum EHttpMethod {
-  GET = 'GET',
-  POST = 'POST',
-  PATCH = 'PATCH',
-  DELETE = 'DELETE',
+  GET = "GET",
+  POST = "POST",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
 }
 
 type THttpServiceConfig = {
@@ -37,22 +38,24 @@ export class HttpService {
   }
 
   private async attachDefaultHeaders(
-    additionalHeaders: FetchOptions['headers'],
-    hasAttachment?: boolean,
+    additionalHeaders: FetchOptions["headers"],
+    hasAttachment?: boolean
   ) {
-    const { accessTokenCookieKey = ACCESS_TOKEN_COOKIE_KEY, attachToken = true } =
-      this.config ?? {};
+    const {
+      accessTokenCookieKey = ACCESS_TOKEN_COOKIE_KEY,
+      attachToken = true,
+    } = this.config ?? {};
 
-    const defaultHeaders: FetchOptions['headers'] = {};
+    const defaultHeaders: FetchOptions["headers"] = {};
 
     if (!hasAttachment) {
-      defaultHeaders['Content-Type'] = 'application/json';
+      defaultHeaders["Content-Type"] = "application/json";
     }
 
     let token = getCookie(accessTokenCookieKey);
 
-    if (typeof window == 'undefined') {
-      const cookies = await import('next/headers').then(mod => mod.cookies);
+    if (typeof window == "undefined") {
+      const cookies = await import("next/headers").then((mod) => mod.cookies);
 
       const cookieStore = cookies();
       token = cookieStore?.get(accessTokenCookieKey)?.value;
@@ -84,7 +87,11 @@ export class HttpService {
       body: hasAttachment ? payload : JSON.stringify(payload),
     });
   }
-  public async patch<T, P>(url: string, payload: P, options: FetchOptions = {}) {
+  public async patch<T, P>(
+    url: string,
+    payload: P,
+    options: FetchOptions = {}
+  ) {
     const hasAttachment = options?.config?.hasAttachment ?? false;
     return this.request<T>(url, {
       ...options,
@@ -103,18 +110,20 @@ export class HttpService {
   }
 
   public async request<T>(url: string, options: FetchOptions = {}): Promise<T> {
-    const { responseInterceptor, hasAttachment = false } = options?.config ?? {};
+    const { responseInterceptor, hasAttachment = false } =
+      options?.config ?? {};
     const fullUrl = `${this.baseURL}${url}`;
     const { useRefreshToken = true } = this.config ?? {};
-    const headers = (await this.attachDefaultHeaders(options?.headers, hasAttachment)) ?? {};
+    const headers =
+      (await this.attachDefaultHeaders(options?.headers, hasAttachment)) ?? {};
 
     try {
       const response: Response = await fetch(fullUrl, {
-        credentials: 'include',
+        credentials: "include",
         headers,
         ...options,
       });
-      if (typeof responseInterceptor === 'function') {
+      if (typeof responseInterceptor === "function") {
         responseInterceptor(response);
       }
 
@@ -123,7 +132,13 @@ export class HttpService {
       // if (response.status === 401 && useRefreshToken) {
       //   return this.refreshToken<T>(fullUrl, options);
       // }
-
+      if (response.status === 401) {
+        return Promise.reject({
+          data: null,
+          message: "Unauthorized access, please login again.",
+          status: 401,
+        });
+      }
       const data = await this.parseJson(response);
 
       if (!response.ok) {
@@ -148,27 +163,29 @@ export class HttpService {
       return json;
     } catch (err) {
       if (response.status === 404) {
-        throw new Error('404 not found');
+        throw new Error("404 not found");
       }
       if (response.status === 500) {
-        throw new Error('There was some problem with the server, please try again');
+        throw new Error(
+          "There was some problem with the server, please try again"
+        );
       }
     }
   }
 
   private async getNewToken() {
-    const url = this.baseURL + '/auth/refresh-token';
+    const url = this.baseURL + "/auth/refresh-token";
     const response = await fetch(url, {
-      credentials: 'include', // If you're using cookies for tokens
-      cache: 'no-store',
+      credentials: "include", // If you're using cookies for tokens
+      cache: "no-store",
     });
 
     if (!response.ok) {
       const { onRefreshTokenError } = this.config ?? {};
-      if (typeof onRefreshTokenError === 'function') {
+      if (typeof onRefreshTokenError === "function") {
         onRefreshTokenError();
       }
-      throw new Error('Failed to refresh token');
+      throw new Error("Failed to refresh token");
     }
 
     const data = await response.json();
@@ -188,10 +205,10 @@ export class HttpService {
       }
     }
 
-    const retryOriginalRequest = new Promise<T>(resolve => {
-      this.subscribeTokenRefresh(async newToken => {
+    const retryOriginalRequest = new Promise<T>((resolve) => {
+      this.subscribeTokenRefresh(async (newToken) => {
         if (options.headers) {
-          options.headers['Authorization'] = 'Bearer ' + newToken;
+          options.headers["Authorization"] = "Bearer " + newToken;
         }
         const response = await fetch(fullUrl, options);
 
@@ -206,7 +223,7 @@ export class HttpService {
     return await retryOriginalRequest;
   }
   private onRefreshed(token: string): void {
-    this.refreshSubscribers.forEach(cb => cb(token));
+    this.refreshSubscribers.forEach((cb) => cb(token));
     this.refreshSubscribers = [];
   }
   private subscribeTokenRefresh(cb: (token: string) => void): void {

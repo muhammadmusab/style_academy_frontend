@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import CategoryTabs from "./category-tabs";
 import Product from "@/components/common/Product";
-import useFilter from "@/_hooks/use-filters";
+import useFilter from "@/hooks/use-filters";
 import { usePathname, useRouter } from "next/navigation";
 import { ProductType } from "@/interface/types";
 import { useToast } from "@/hooks/useToast";

@@ -11,13 +11,19 @@ import { InputControlType } from "@/components/ui/form/Form/input-control";
 import { Row } from "@/components/grid/Row";
 import { Col } from "@/components/grid/Col";
 import FormContainer from "@/components/ui/form/Form/form-container";
+import { Toaster } from "sonner";
+import { useToast } from "@/hooks/useToast";
 const passwordSchema = yup.object({
   oldPassword: yup.string().required("Required"),
   newPassword: yup.string().required("Required"),
-  confirmPassword: yup.string().required("Required"),
+  confirmPassword: yup
+    .string()
+    .required("Confirm Password is required field")
+    .oneOf([yup.ref("newPassword")], "Passwords must match"),
 });
 
 const ResetPassword = () => {
+  const { errorToast, successToast } = useToast();
   const form = useForm({
     resolver: yupResolver(passwordSchema),
     defaultValues: {
@@ -43,7 +49,7 @@ const ResetPassword = () => {
       colClass: "max-w-[100%] basis-[100%]",
     },
     {
-      name:'password',
+      name: "newPassword",
       formControl: InputControlType.Input,
       label: {
         className: "absolute top-[12px] left-0",
@@ -74,10 +80,18 @@ const ResetPassword = () => {
     },
   ];
   const onSubmit = async (formData: FormData) => {
-    const valid = await form.trigger();
-    if (!valid) return;
-    const data = await actions.resetPassword(formData);
-    console.log(data);
+    try {
+      const valid = await form.trigger();
+      if (!valid) return;
+      const res = await actions.resetPassword(formData);
+      if (res && res.success) {
+        successToast("Profile Updated Successfully");
+      } else if (!res.success) {
+        errorToast(res.data);
+      }
+    } catch (error: any) {
+      errorToast(error.message);
+    }
   };
   return (
     <Dialog>
@@ -87,6 +101,7 @@ const ResetPassword = () => {
       <DialogContent className="bg-white p-[12px]">
         <h3 className="font-semibold mb-[20px] text-[20px]">Change Password</h3>
         <Form {...form}>
+        
           <form action={onSubmit} className="space-y-8">
             <Row className="justify-between gap-2">
               {inputs.map(({ colClass, ...input }, i) => (
